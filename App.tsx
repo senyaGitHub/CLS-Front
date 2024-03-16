@@ -1,15 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
-import { Ionicons } from 'react-native-vector-icons'; // Using react-native-vector-icons for icons
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { Ionicons } from 'react-native-vector-icons';
 
 const Tab = createBottomTabNavigator();
 
 // Placeholder components for History and Map screens
-const HistoryScreen = () => (
+const HistoryScreen = ({ history, clearHistory }) => (
   <View style={styles.container}>
     <Text>History Screen</Text>
+    {history.map((item, index) => (
+      <Text key={index}>Item: {item.tag}</Text>
+    ))}
+    <TouchableOpacity style={styles.clearButton} onPress={clearHistory}>
+      <Text style={styles.buttonText}>Clear History</Text>
+    </TouchableOpacity>
   </View>
 );
 
@@ -19,13 +32,26 @@ const MapScreen = () => (
   </View>
 );
 
-const HomeScreen = () => {
+const HomeScreen = ({ setHistory }) => {
   const [shipmentStatus, setShipmentStatus] = useState('');
+  const [productInfo, setProductInfo] = useState(null);
+  const navigation = useNavigation();
+  const [tagCounter, setTagCounter] = useState(1);
 
   const handleScanRFIDTag = () => {
     // Simulate scanning RFID tag and retrieving data
-    const scannedRFIDData = 'Scanned RFID data: XXX123YYY';
-    setShipmentStatus(scannedRFIDData);
+    const scannedRFIDData = {
+      tag: `Tag${tagCounter}`,
+      shippedTo: 'Destination',
+      successful: true, // Since it's a successful scan
+    };
+
+    setProductInfo(scannedRFIDData);
+    setShipmentStatus('In Transit');
+    setTagCounter(prevCounter => prevCounter + 1);
+
+    // Add scanned item to history
+    setHistory(prevHistory => [...prevHistory, scannedRFIDData]);
   };
 
   useEffect(() => {
@@ -40,11 +66,18 @@ const HomeScreen = () => {
       <View style={styles.content}>
         <Text style={styles.title}>RFID Tag Scanner</Text>
         <TouchableOpacity style={styles.scanButton} onPress={handleScanRFIDTag}>
-          <Text style={styles.buttonText}>Scan RFID Tag</Text>
+          <Text style={styles.buttonText}>Scan RFID Tag and Add to History</Text>
         </TouchableOpacity>
         {shipmentStatus ? (
           <View style={styles.scannedDataContainer}>
             <Text style={styles.scannedDataText}>Shipment Status: {shipmentStatus}</Text>
+            {productInfo && (
+              <View>
+                <Text>Product Information:</Text>
+                <Text>Tag: {productInfo.tag}</Text>
+                <Text>Shipped To: {productInfo.shippedTo}</Text>
+              </View>
+            )}
           </View>
         ) : null}
       </View>
@@ -71,19 +104,34 @@ const tabBarIcon = ({ focused, color, size, route }) => {
   return <Ionicons name={iconName} size={size} color={color} />;
 };
 
-
 const App = () => {
+  const [history, setHistory] = useState([]);
+
+  const clearHistory = () => {
+    setHistory([]);
+  };
+
   return (
     <NavigationContainer>
       <StatusBar barStyle="dark-content" />
       <Tab.Navigator
-        screenOptions={{ tabBarIcon }}
-        tabBarOptions={{
-          activeTintColor: 'blue',
-          inactiveTintColor: 'gray',
-        }}>
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="History" component={HistoryScreen} />
+        screenOptions={{
+          tabBarIcon: tabBarIcon, // Use the defined function for icons
+          tabBarActiveTintColor: 'blue', // Migrate options to screenOptions
+          tabBarInactiveTintColor: 'gray',
+          tabBarStyle: {
+            backgroundColor: 'white', // Background color of the tab bar
+            borderTopWidth: 1, // Border at the top of the tab bar
+            borderTopColor: 'lightgray', // Border color
+          },
+        }}
+      >
+        <Tab.Screen name="Home">
+          {() => <HomeScreen setHistory={setHistory} />}
+        </Tab.Screen>
+        <Tab.Screen name="History">
+          {() => <HistoryScreen history={history} clearHistory={clearHistory} />}
+        </Tab.Screen>
         <Tab.Screen name="Map" component={MapScreen} />
       </Tab.Navigator>
     </NavigationContainer>
@@ -111,6 +159,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 24,
+  },
+  clearButton: {
+    backgroundColor: '#FF6347',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    marginTop: 10,
   },
   buttonText: {
     color: '#FFF',
