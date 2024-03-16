@@ -7,9 +7,10 @@ import {
   Text,
   useColorScheme,
   View,
-  Button,
   TouchableOpacity,
 } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 type SectionProps = {
   title: string;
@@ -26,7 +27,9 @@ const Section: React.FC<SectionProps> = ({ title, children }) => {
           {
             color: isDarkMode ? 'white' : 'black',
           },
-        ]}>
+        ]}
+        accessibilityRole="header"
+      >
         {title}
       </Text>
       <Text
@@ -35,14 +38,15 @@ const Section: React.FC<SectionProps> = ({ title, children }) => {
           {
             color: isDarkMode ? '#ddd' : '#333',
           },
-        ]}>
+        ]}
+      >
         {children}
       </Text>
     </View>
   );
 };
 
-const App: React.FC = () => {
+const HomeScreen = ({ navigation }: { navigation: any }) => {
   const isDarkMode = useColorScheme() === 'dark';
   const [shipmentStatus, setShipmentStatus] = useState('');
 
@@ -54,38 +58,29 @@ const App: React.FC = () => {
   }, []);
 
   const handleScanQRCode = () => {
-    // Functionality to access camera for scanning QR codes will be implemented here
-    console.log('Scanning QR code...');
-  };
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? '#222' : '#fff',
+    // Navigate to the Camera screen
+    navigation.navigate('Camera');
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
+    <SafeAreaView style={styles.container}>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+        backgroundColor={isDarkMode ? '#222' : '#fff'}
       />
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? '#111' : '#eee',
-            padding: 20,
-            flex: 1,
-            justifyContent: 'space-between',
-          }}>
-          <View>
-            <Section title="Transport Logistics Management System">
-              Shipment Status: {shipmentStatus}
-            </Section>
-          </View>
+        style={{ backgroundColor: isDarkMode ? '#111' : '#eee' }}
+      >
+        <View style={styles.content}>
+          <Section title="Transport Logistics Management System">
+            Shipment Status: {shipmentStatus}
+          </Section>
           <TouchableOpacity
             style={styles.scanButton}
-            onPress={handleScanQRCode}>
+            onPress={handleScanQRCode}
+            accessibilityLabel="Scan QR Code"
+          >
             <Text style={styles.buttonText}>Scan QR Code</Text>
           </TouchableOpacity>
         </View>
@@ -94,9 +89,38 @@ const App: React.FC = () => {
   );
 };
 
+const CameraScreen = () => {
+  // Camera screen implementation goes here
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Camera Screen</Text>
+    </View>
+  );
+};
+
+const Stack = createStackNavigator();
+
+const App: React.FC = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Camera" component={CameraScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    padding: 20,
+    paddingBottom: 40,
+  },
   sectionContainer: {
-    marginTop: 16,
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 24,
