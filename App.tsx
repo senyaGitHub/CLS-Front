@@ -14,7 +14,6 @@ import { Ionicons } from 'react-native-vector-icons';
 
 const Tab = createBottomTabNavigator();
 
-// Placeholder components for History and Map screens
 const HistoryScreen = ({ history, clearHistory }) => (
   <View style={styles.container}>
     <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -42,27 +41,56 @@ const MapScreen = () => (
 const HomeScreen = ({ setHistory }) => {
   const [shipmentStatus, setShipmentStatus] = useState('');
   const [productInfo, setProductInfo] = useState(null);
+  const [buttonVisibility, setButtonVisibility] = useState([]);
   const navigation = useNavigation();
   const [tagCounter, setTagCounter] = useState(1);
 
   const handleScanRFIDTag = () => {
-    // Simulate scanning RFID tag and retrieving data
     const scannedRFIDData = {
       tag: `Tag${tagCounter}`,
       shippedTo: `Destination ${tagCounter}`,
-      successful: tagCounter % 2 === 0, // Alternate between successful and unsuccessful scans
+      successful: tagCounter % 2 === 0,
     };
 
     setProductInfo(scannedRFIDData);
     setShipmentStatus('In Transit');
     setTagCounter(prevCounter => prevCounter + 1);
+    setButtonVisibility(prevVisibility => [...prevVisibility, true]);
+  };
 
-    // Add scanned item to history
-    setHistory(prevHistory => [...prevHistory, scannedRFIDData]);
+  const handleMarkSuccess = (index) => {
+    if (productInfo && buttonVisibility[index]) {
+      const updatedProductInfo = { ...productInfo, successful: true };
+      setProductInfo(updatedProductInfo);
+      setShipmentStatus('Success');
+      updateButtonVisibility(index);
+      updateHistory(updatedProductInfo);
+    }
+  };
+
+  const handleMarkDamaged = (index) => {
+    if (productInfo && buttonVisibility[index]) {
+      const updatedProductInfo = { ...productInfo, successful: false };
+      setProductInfo(updatedProductInfo);
+      setShipmentStatus('Damaged');
+      updateButtonVisibility(index);
+      updateHistory(updatedProductInfo);
+    }
+  };
+
+  const updateButtonVisibility = (index) => {
+    setButtonVisibility(prevVisibility => {
+      const updatedVisibility = [...prevVisibility];
+      updatedVisibility[index] = false;
+      return updatedVisibility;
+    });
+  };
+
+  const updateHistory = (item) => {
+    setHistory(prevHistory => [...prevHistory, item]);
   };
 
   useEffect(() => {
-    // Simulate fetching shipment status from blockchain or API
     setTimeout(() => {
       setShipmentStatus('In Transit');
     }, 2000);
@@ -84,6 +112,18 @@ const HomeScreen = ({ setHistory }) => {
                 <Text>Tag: {productInfo.tag}</Text>
                 <Text>Shipped To: {productInfo.shippedTo}</Text>
                 <Text>Status: {productInfo.successful ? 'Successful' : 'Unsuccessful'}</Text>
+                {buttonVisibility.map((visible, index) => (
+                  visible && (
+                    <View key={index} style={{ flexDirection: 'row', marginTop: 10 }}>
+                      <TouchableOpacity style={[styles.markButton, { backgroundColor: '#32CD32' }]} onPress={() => handleMarkSuccess(index)}>
+                        <Text style={styles.buttonText}>Mark as Success</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[styles.markButton, { backgroundColor: '#FF6347' }]} onPress={() => handleMarkDamaged(index)}>
+                        <Text style={styles.buttonText}>Mark as Damaged</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )
+                ))}
               </View>
             )}
           </View>
@@ -93,10 +133,9 @@ const HomeScreen = ({ setHistory }) => {
   );
 };
 
-// Define tabBarIcon function outside of Tab.Navigator
 const tabBarIcon = ({ focused, color, size, route }) => {
   if (!route) {
-    return null; // If route is undefined, return null
+    return null;
   }
 
   let iconName;
@@ -124,13 +163,13 @@ const App = () => {
       <StatusBar barStyle="dark-content" />
       <Tab.Navigator
         screenOptions={{
-          tabBarIcon: tabBarIcon, // Use the defined function for icons
-          tabBarActiveTintColor: 'blue', // Migrate options to screenOptions
+          tabBarIcon: tabBarIcon,
+          tabBarActiveTintColor: 'blue',
           tabBarInactiveTintColor: 'gray',
           tabBarStyle: {
-            backgroundColor: 'white', // Background color of the tab bar
-            borderTopWidth: 1, // Border at the top of the tab bar
-            borderTopColor: 'lightgray', // Border color
+            backgroundColor: 'white',
+            borderTopWidth: 1,
+            borderTopColor: 'lightgray',
           },
         }}
       >
@@ -207,6 +246,15 @@ const styles = StyleSheet.create({
   },
   historyItemText: {
     fontSize: 16,
+  },
+  markButton: {
+    flex: 1,
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    marginHorizontal: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
