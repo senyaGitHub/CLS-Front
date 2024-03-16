@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ScrollView
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
@@ -16,10 +17,16 @@ const Tab = createBottomTabNavigator();
 // Placeholder components for History and Map screens
 const HistoryScreen = ({ history, clearHistory }) => (
   <View style={styles.container}>
-    <Text>History Screen</Text>
-    {history.map((item, index) => (
-      <Text key={index}>Item: {item.tag}</Text>
-    ))}
+    <ScrollView contentContainerStyle={styles.scrollViewContent}>
+      <Text style={styles.screenTitle}>History Screen</Text>
+      {history.map((item, index) => (
+        <View key={index} style={styles.historyItem}>
+          <Text style={styles.historyItemText}>Item: {item.tag}</Text>
+          <Text style={styles.historyItemText}>Shipped To: {item.shippedTo}</Text>
+          <Text style={styles.historyItemText}>Status: {item.successful ? 'Successful' : 'Unsuccessful'}</Text>
+        </View>
+      ))}
+    </ScrollView>
     <TouchableOpacity style={styles.clearButton} onPress={clearHistory}>
       <Text style={styles.buttonText}>Clear History</Text>
     </TouchableOpacity>
@@ -42,8 +49,8 @@ const HomeScreen = ({ setHistory }) => {
     // Simulate scanning RFID tag and retrieving data
     const scannedRFIDData = {
       tag: `Tag${tagCounter}`,
-      shippedTo: 'Destination',
-      successful: true, // Since it's a successful scan
+      shippedTo: `Destination ${tagCounter}`,
+      successful: tagCounter % 2 === 0, // Alternate between successful and unsuccessful scans
     };
 
     setProductInfo(scannedRFIDData);
@@ -76,6 +83,7 @@ const HomeScreen = ({ setHistory }) => {
                 <Text>Product Information:</Text>
                 <Text>Tag: {productInfo.tag}</Text>
                 <Text>Shipped To: {productInfo.shippedTo}</Text>
+                <Text>Status: {productInfo.successful ? 'Successful' : 'Unsuccessful'}</Text>
               </View>
             )}
           </View>
@@ -141,8 +149,6 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   content: {
     flex: 1,
@@ -159,13 +165,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 24,
+    marginBottom: 10,
   },
   clearButton: {
     backgroundColor: '#FF6347',
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 24,
-    marginTop: 10,
+    marginBottom: 10,
+    alignSelf: 'center',
   },
   buttonText: {
     color: '#FFF',
@@ -179,6 +187,25 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   scannedDataText: {
+    fontSize: 16,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  screenTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  historyItem: {
+    marginBottom: 10,
+    padding: 10,
+    backgroundColor: '#EEE',
+    borderRadius: 10,
+  },
+  historyItemText: {
     fontSize: 16,
   },
 });
