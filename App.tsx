@@ -1,12 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -15,21 +7,16 @@ import {
   Text,
   useColorScheme,
   View,
+  Button,
+  TouchableOpacity,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
+type SectionProps = {
   title: string;
-}>;
+  children: React.ReactNode;
+};
 
-function Section({children, title}: SectionProps): React.JSX.Element {
+const Section: React.FC<SectionProps> = ({ title, children }) => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={styles.sectionContainer}>
@@ -37,7 +24,7 @@ function Section({children, title}: SectionProps): React.JSX.Element {
         style={[
           styles.sectionTitle,
           {
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: isDarkMode ? 'white' : 'black',
           },
         ]}>
         {title}
@@ -46,20 +33,33 @@ function Section({children, title}: SectionProps): React.JSX.Element {
         style={[
           styles.sectionDescription,
           {
-            color: isDarkMode ? Colors.light : Colors.dark,
+            color: isDarkMode ? '#ddd' : '#333',
           },
         ]}>
         {children}
       </Text>
     </View>
   );
-}
+};
 
-function App(): React.JSX.Element {
+const App: React.FC = () => {
   const isDarkMode = useColorScheme() === 'dark';
+  const [shipmentStatus, setShipmentStatus] = useState('');
+
+  useEffect(() => {
+    // Simulate fetching shipment status from blockchain or API
+    setTimeout(() => {
+      setShipmentStatus('In Transit');
+    }, 2000);
+  }, []);
+
+  const handleScanQRCode = () => {
+    // Functionality to access camera for scanning QR codes will be implemented here
+    console.log('Scanning QR code...');
+  };
 
   const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    backgroundColor: isDarkMode ? '#222' : '#fff',
   };
 
   return (
@@ -71,47 +71,54 @@ function App(): React.JSX.Element {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <Header />
         <View
           style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
+            backgroundColor: isDarkMode ? '#111' : '#eee',
+            padding: 20,
+            flex: 1,
+            justifyContent: 'space-between',
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+          <View>
+            <Section title="Transport Logistics Management System">
+              Shipment Status: {shipmentStatus}
+            </Section>
+          </View>
+          <TouchableOpacity
+            style={styles.scanButton}
+            onPress={handleScanQRCode}>
+            <Text style={styles.buttonText}>Scan QR Code</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+    marginTop: 16,
   },
   sectionTitle: {
     fontSize: 24,
     fontWeight: '600',
+    marginBottom: 8,
   },
   sectionDescription: {
-    marginTop: 8,
     fontSize: 18,
     fontWeight: '400',
+    marginBottom: 16,
   },
-  highlight: {
-    fontWeight: '700',
+  scanButton: {
+    backgroundColor: '#007AFF',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    alignSelf: 'flex-end',
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
