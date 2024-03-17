@@ -101,25 +101,24 @@ const HomeScreen = ({ setHistory }) => {
       <View style={styles.content}>
         <Text style={styles.title}>RFID Tag Scanner</Text>
         <TouchableOpacity style={styles.scanButton} onPress={handleScanRFIDTag}>
-          <Text style={styles.buttonText}>Scan RFID Tag and Add to History</Text>
+          <Text style={styles.buttonText}>Scan RFID Tag</Text>
         </TouchableOpacity>
         {shipmentStatus ? (
           <View style={styles.scannedDataContainer}>
             <Text style={styles.scannedDataText}>Shipment Status: {shipmentStatus}</Text>
             {productInfo && (
               <View>
-                <Text>Product Information:</Text>
-                <Text>Tag: {productInfo.tag}</Text>
-                <Text>Shipped To: {productInfo.shippedTo}</Text>
-                <Text>Status: {productInfo.successful ? 'Successful' : 'Unsuccessful'}</Text>
+                <Text style={styles.productInfoTitle}>Product Information:</Text>
+                <Text style={styles.productInfoText}>Tag: {productInfo.tag}</Text>
+                <Text style={styles.productInfoText}>Shipped To: {productInfo.shippedTo}</Text>
                 {buttonVisibility.map((visible, index) => (
                   visible && (
                     <View key={index} style={{ flexDirection: 'row', marginTop: 10 }}>
                       <TouchableOpacity style={[styles.markButton, { backgroundColor: '#32CD32' }]} onPress={() => handleMarkSuccess(index)}>
-                        <Text style={styles.buttonText}>Mark as Success</Text>
+                        <Text style={styles.buttonText}>Delivered</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[styles.markButton, { backgroundColor: '#FF6347' }]} onPress={() => handleMarkDamaged(index)}>
-                        <Text style={styles.buttonText}>Mark as Damaged</Text>
+                      <TouchableOpacity style={[styles.markButton, styles.markButtonDamaged, { backgroundColor: '#FF6347' }]} onPress={() => handleMarkDamaged(index)}>
+                        <Text style={styles.buttonText}>Damaged</Text>
                       </TouchableOpacity>
                     </View>
                   )
@@ -193,6 +192,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
@@ -204,14 +204,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 24,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   clearButton: {
     backgroundColor: '#FF6347',
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 24,
-    marginBottom: 10,
+    marginBottom: 20,
     alignSelf: 'center',
   },
   buttonText: {
@@ -221,12 +221,20 @@ const styles = StyleSheet.create({
   },
   scannedDataContainer: {
     marginTop: 20,
-    backgroundColor: '#EEE',
-    padding: 20,
-    borderRadius: 10,
   },
   scannedDataText: {
-    fontSize: 16,
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  productInfoTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  productInfoText: {
+    fontSize: 18,
+    marginBottom: 10,
   },
   scrollViewContent: {
     flexGrow: 1,
@@ -248,13 +256,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   markButton: {
-    flex: 1,
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 24,
     marginHorizontal: 5,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  markButtonDamaged: {
+    backgroundColor: '#FF6347',
   },
 });
 
