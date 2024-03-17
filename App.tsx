@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { Ionicons } from 'react-native-vector-icons';
+//import { Ionicons } from 'react-native-vector-icons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const Tab = createBottomTabNavigator();
 
@@ -200,36 +201,66 @@ const App = () => {
     setHistory([]);
   };
 
-  return (
-    <NavigationContainer>
-      <StatusBar barStyle="dark-content" />
-      <Tab.Navigator
-        screenOptions={{
-          tabBarIcon: tabBarIcon,
-          tabBarActiveTintColor: 'blue',
-          tabBarInactiveTintColor: 'gray',
-          tabBarStyle: {
-            backgroundColor: 'white',
-            borderTopWidth: 1,
-            borderTopColor: 'lightgray',
-          },
-        }}
-      >
-        <Tab.Screen name="Home">
-          {() => <HomeScreen setHistory={setHistory} isSeller={isSeller} />}
-        </Tab.Screen>
-        <Tab.Screen name="History">
-          {() => <HistoryScreen history={history} clearHistory={clearHistory} />}
-        </Tab.Screen>
-        <Tab.Screen name="Map" component={MapScreen} />
-        <Tab.Screen name="SwitchAccount">
-          {() => (
-            <SwitchAccountScreen setIsSeller={setIsSeller} isSeller={isSeller} />
-          )}
-        </Tab.Screen>
-      </Tab.Navigator>
-    </NavigationContainer>
-  );
+    return (
+      <NavigationContainer>
+        <StatusBar barStyle="dark-content" />
+        <Tab.Navigator
+          screenOptions={{
+            tabBarIcon: tabBarIcon,
+            tabBarActiveTintColor: 'blue',
+            tabBarInactiveTintColor: 'gray',
+            tabBarStyle: {
+              backgroundColor: 'white',
+              borderTopWidth: 1,
+              borderTopColor: 'lightgray',
+            },
+          }}
+        >
+          <Tab.Screen
+            name="Home"
+            options={{
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="home-outline" size={size} color={color} />
+              ),
+            }}
+          >
+            {() => <HomeScreen setHistory={setHistory} isSeller={isSeller} />}
+          </Tab.Screen>
+          <Tab.Screen
+            name="History"
+            options={{
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="time-outline" size={size} color={color} />
+              ),
+            }}
+          >
+            {() => <HistoryScreen history={history} clearHistory={clearHistory} />}
+          </Tab.Screen>
+          <Tab.Screen
+            name="Map"
+            options={{
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="map-outline" size={size} color={color} />
+              ),
+            }}
+          >
+            {() => <MapScreen />}
+          </Tab.Screen>
+          <Tab.Screen
+            name="SwitchAccount"
+            options={{
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="person-circle-outline" size={size} color={color} />
+              ),
+            }}
+          >
+            {() => (
+              <SwitchAccountScreen setIsSeller={setIsSeller} isSeller={isSeller} />
+            )}
+          </Tab.Screen>
+        </Tab.Navigator>
+      </NavigationContainer>
+    );
 };
 
 const styles = StyleSheet.create({
