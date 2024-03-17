@@ -38,7 +38,14 @@ const MapScreen = () => (
   </View>
 );
 
-const HomeScreen = ({ setHistory }) => {
+const DispatchScreen = () => (
+  <View style={styles.container}>
+    <Text>Dispatch Screen</Text>
+    {/* Add UI components for dispatching items */}
+  </View>
+);
+
+const HomeScreen = ({ setHistory, isSeller }) => {
   const [shipmentStatus, setShipmentStatus] = useState('');
   const [productInfo, setProductInfo] = useState(null);
   const [buttonVisibility, setButtonVisibility] = useState([]);
@@ -100,6 +107,11 @@ const HomeScreen = ({ setHistory }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>RFID Tag Scanner</Text>
+        {isSeller && (
+          <TouchableOpacity style={styles.dispatchButton} onPress={() => navigation.navigate('Dispatch')}>
+            <Text style={styles.buttonText}>Dispatch Item</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity style={styles.scanButton} onPress={handleScanRFIDTag}>
           <Text style={styles.buttonText}>Scan RFID Tag</Text>
         </TouchableOpacity>
@@ -132,6 +144,20 @@ const HomeScreen = ({ setHistory }) => {
   );
 };
 
+const SwitchAccountScreen = ({ setIsSeller, isSeller }) => (
+  <View style={styles.container}>
+    <Text>Switch Account Screen</Text>
+    <TouchableOpacity
+      style={styles.switchButton}
+      onPress={() => setIsSeller(!isSeller)} // Toggle the role
+    >
+      <Text style={styles.buttonText}>
+        Switch to {isSeller ? 'Buyer' : 'Seller'}
+      </Text>
+    </TouchableOpacity>
+  </View>
+);
+
 const tabBarIcon = ({ focused, color, size, route }) => {
   if (!route) {
     return null;
@@ -145,6 +171,8 @@ const tabBarIcon = ({ focused, color, size, route }) => {
     iconName = focused ? 'time' : 'time-outline';
   } else if (route.name === 'Map') {
     iconName = focused ? 'map' : 'map-outline';
+  } else if (route.name === 'SwitchAccount') {
+    iconName = focused ? 'person-circle' : 'person-circle-outline';
   }
 
   return <Ionicons name={iconName} size={size} color={color} />;
@@ -152,6 +180,7 @@ const tabBarIcon = ({ focused, color, size, route }) => {
 
 const App = () => {
   const [history, setHistory] = useState([]);
+  const [isSeller, setIsSeller] = useState(false);
 
   const clearHistory = () => {
     setHistory([]);
@@ -173,12 +202,17 @@ const App = () => {
         }}
       >
         <Tab.Screen name="Home">
-          {() => <HomeScreen setHistory={setHistory} />}
+          {() => <HomeScreen setHistory={setHistory} isSeller={isSeller} />}
         </Tab.Screen>
         <Tab.Screen name="History">
           {() => <HistoryScreen history={history} clearHistory={clearHistory} />}
         </Tab.Screen>
         <Tab.Screen name="Map" component={MapScreen} />
+        <Tab.Screen name="SwitchAccount">
+          {() => (
+            <SwitchAccountScreen setIsSeller={setIsSeller} isSeller={isSeller} />
+          )}
+        </Tab.Screen>
       </Tab.Navigator>
     </NavigationContainer>
   );
@@ -187,6 +221,8 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,
@@ -206,6 +242,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     marginBottom: 20,
   },
+  dispatchButton: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    marginBottom: 20,
+  },
   clearButton: {
     backgroundColor: '#FF6347',
     borderRadius: 10,
@@ -213,6 +256,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     marginBottom: 20,
     alignSelf: 'center',
+  },
+  switchButton: {
+    backgroundColor: '#2196F3',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    marginBottom: 20,
   },
   buttonText: {
     color: '#FFF',
