@@ -49,6 +49,7 @@ const HomeScreen = ({ setHistory, isSeller }) => {
   const [shipmentStatus, setShipmentStatus] = useState('');
   const [productInfo, setProductInfo] = useState(null);
   const [buttonVisibility, setButtonVisibility] = useState([]);
+  const [dispatchHash, setDispatchHash] = useState('');
   const navigation = useNavigation();
   const [tagCounter, setTagCounter] = useState(1);
 
@@ -85,6 +86,12 @@ const HomeScreen = ({ setHistory, isSeller }) => {
     }
   };
 
+  const handleDispatch = () => {
+    // Generate a dummy hash for demonstration
+    const hash = "12345ABC";
+    setDispatchHash(hash);
+  };
+
   const updateButtonVisibility = (index) => {
     setButtonVisibility(prevVisibility => {
       const updatedVisibility = [...prevVisibility];
@@ -107,14 +114,16 @@ const HomeScreen = ({ setHistory, isSeller }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>RFID Tag Scanner</Text>
+        {!isSeller && (
+          <TouchableOpacity style={styles.scanButton} onPress={handleScanRFIDTag}>
+            <Text style={styles.buttonText}>Scan RFID Tag</Text>
+          </TouchableOpacity>
+        )}
         {isSeller && (
-          <TouchableOpacity style={styles.dispatchButton} onPress={() => navigation.navigate('Dispatch')}>
+          <TouchableOpacity style={styles.dispatchButton} onPress={handleDispatch}>
             <Text style={styles.buttonText}>Dispatch Item</Text>
           </TouchableOpacity>
         )}
-        <TouchableOpacity style={styles.scanButton} onPress={handleScanRFIDTag}>
-          <Text style={styles.buttonText}>Scan RFID Tag</Text>
-        </TouchableOpacity>
         {shipmentStatus ? (
           <View style={styles.scannedDataContainer}>
             <Text style={styles.scannedDataText}>Shipment Status: {shipmentStatus}</Text>
@@ -139,6 +148,11 @@ const HomeScreen = ({ setHistory, isSeller }) => {
             )}
           </View>
         ) : null}
+        {dispatchHash !== '' && (
+          <View style={styles.hashContainer}>
+            <Text style={styles.hashText}>Dispatch Hash: {dispatchHash}</Text>
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -315,6 +329,15 @@ const styles = StyleSheet.create({
   },
   markButtonDamaged: {
     backgroundColor: '#FF6347',
+  },
+  hashContainer: {
+    marginTop: 20,
+    backgroundColor: '#EEE',
+    padding: 10,
+    borderRadius: 10,
+  },
+  hashText: {
+    fontSize: 16,
   },
 });
 
